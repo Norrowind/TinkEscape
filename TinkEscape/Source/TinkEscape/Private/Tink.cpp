@@ -4,69 +4,33 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
+#include "DroidMovementComponent.h"
+#include "DroidBody.h"
 
 // Sets default values
 ATink::ATink()
 {
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
+	DroidBody = CreateDefaultSubobject<UDroidBody>(TEXT("Droid Body"));
+	SetRootComponent(DroidBody);
+	DroidBody->SetNotifyRigidBodyCollision(true);
+
+	DroidAppearance = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Tink"));
+	DroidAppearance->SetupAttachment(RootComponent);
+
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
-	SpringArm->SetupAttachment(RootComponent);
+	SpringArm->SetupAttachment(DroidAppearance);
 	SpringArm->SetRelativeLocationAndRotation(SpringArmLocation, SpringArmRotation);
 	SpringArm->TargetArmLength = SpringArmLength;
 	SpringArm->bEnableCameraLag = true;
+
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	CameraComponent->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
 
+	DroidMovementComponent = CreateDefaultSubobject<UDroidMovementComponent>(TEXT("MovingComponent"));
 }
 
-// Called when the game starts or when spawned
-void ATink::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
-
-// Called every frame
-void ATink::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-	//Rotate Tick with camera moving
-	FRotator NewTinkRotation = GetActorRotation();
-	NewTinkRotation.Yaw += CameraInput.X;
-	SetActorRotation(NewTinkRotation);
-
-	//Rotate camera pitch with spring arm
-	if (!ensure(SpringArm)) { return; }
-	else
-	{
-		FRotator NewSpringArmRotation = SpringArm->GetComponentRotation();
-		NewSpringArmRotation.Pitch += CameraInput.Y;
-		SpringArm->SetWorldRotation(NewSpringArmRotation);
-	}
-
-	//Handle movement based on axes
-	if (!MovementInput.IsZero())
-	{
-		MovementInput = MovementInput.GetSafeNormal() * 400.0f;
-		FVector NewTinkLocation = GetActorLocation();
-		NewTinkLocation += GetActorForwardVector() * MovementInput.X * DeltaTime;
-		NewTinkLocation += GetActorRightVector() * MovementInput.Y * DeltaTime;
-		SetActorLocation(NewTinkLocation);
-	}
-}
-
-// Called to bind functionality to input
-void ATink::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-	PlayerInputComponent->BindAxis("CameraPitch", this, &ATink::CameraPitch);
-	PlayerInputComponent->BindAxis("CameraYaw", this, &ATink::CameraYaw);
-	PlayerInputComponent->BindAxis("MoveForward", this, &ATink::MoveForward);
-	PlayerInputComponent->BindAxis("MoveRight", this, &ATink::MoveRight);
-}
 
 void ATink::CameraPitch(float AxisValue)
 {
@@ -78,13 +42,55 @@ void ATink::CameraYaw(float AxisValue)
 	CameraInput.X = AxisValue;
 }
 
-void ATink::MoveForward(float AxisValue)
+// Called to bind functionality to input
+void ATink::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
-	MovementInput.X = FMath::Clamp(AxisValue, -1.0f, 1.0f);
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	PlayerInputComponent->BindAxis("CameraPitch", this, &ATink::CameraPitch);
+	PlayerInputComponent->BindAxis("CameraYaw", this, &ATink::CameraYaw);
+	PlayerInputComponent->BindAxis("MoveForward", DroidMovementComponent, &UDroidMovementComponent::IntendMoveForward);
+	PlayerInputComponent->BindAxis("MoveRight", DroidMovementComponent, &UDroidMovementComponent::IntendMoveRight);
 }
 
-void ATink::MoveRight(float AxisValue)
+// Called when the game starts or when spawned
+void ATink::BeginPlay()
 {
-	MovementInput.Y = FMath::Clamp(AxisValue, -1.0f, 1.0f);
+	Super::BeginPlay();
+
 }
+
+// Called every frame
+void ATink::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	RotateCameraPitch();
+	RotateTinkWithCamera();
+
+}
+
+//Rotate camera pitch with spring arm, but limit it
+void ATink::RotateCameraPitch()
+{
+	if (!ensure(SpringArm)) { return; }
+	FRotator NewSpringArmRotation = SpringArm->GetComponentRotation();
+	NewSpringArmRotation.Pitch = FMath::Clamp(NewSpringArmRotation.Pitch + CameraInput.Y, MinSpringArmPitch, MaxSpringArmPitch);
+	SpringArm->SetWorldRotation(NewSpringArmRotation);
+
+}
+
+void ATink::RotateTinkWithCamera()
+{	
+	FRotator NewRotation = GetActorRotation();
+	NewRotation.Yaw += CameraInput.X;
+	SetActorRotation(NewRotation);
+
+}
+
+
+
+
+
+
 

@@ -9,7 +9,9 @@
 //Forward declaration
 class USpringArmComponent;
 class UCameraComponent;
-
+class UDroidMovementComponent;
+class UDroidBody;
+class UStaticMeshComponent;
 
 UCLASS()
 class TINKESCAPE_API ATink : public APawn
@@ -27,8 +29,17 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Setup")
 	USpringArmComponent* SpringArm = nullptr;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Setup")
+	UPROPERTY(VisibleAnywhere, Category = "Setup")
 	UCameraComponent* CameraComponent = nullptr;
+
+	UPROPERTY(VisibleAnywhere, Category = "Setup")
+	UDroidMovementComponent* DroidMovementComponent = nullptr;
+
+	UPROPERTY(VisibleAnywhere, Category = "Setup")
+	UDroidBody* DroidBody = nullptr;
+
+	UPROPERTY(VisibleAnywhere, Category = "Setup")
+	UStaticMeshComponent* DroidAppearance = nullptr;
 
 
 public:	
@@ -39,14 +50,13 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 private:
-	//Functions to handle input
+	//Functions to camera input
 	void CameraPitch(float AxisValue);
 	void CameraYaw(float AxisValue);
-	void MoveForward(float AxisValue);
-	void MoveRight(float AxisValue);
+	void RotateCameraPitch();
+	void RotateTinkWithCamera();
 
-	//Input variables
-	FVector2D MovementInput;
+	//Input variable
 	FVector2D CameraInput;
 
 	//Component Parametrs
@@ -59,4 +69,9 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Setup")
 	float SpringArmLength = 400.0f;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Setup")
+	float MinSpringArmPitch = -80.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Setup")
+	float MaxSpringArmPitch = -15.0f;
 };
