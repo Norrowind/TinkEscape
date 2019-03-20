@@ -10,6 +10,8 @@
  * Component which represnts physics body of droid, which actualy is anti-gravity pillow
  */
 
+class UHoverComponent;
+
 UCLASS(meta = (BlueprintSpawnableComponent))
 class TINKESCAPE_API UDroidBody : public UStaticMeshComponent
 {
@@ -29,16 +31,18 @@ private:
 	void MoveRight();
 	
 	UFUNCTION()
-	void OnHit(UPrimitiveComponent* HitComponent, AActor* OthetActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
+	void OnHover();
 
 	virtual void BeginPlay() override;
 	
 	//Driving force in Newtons
 	UPROPERTY(EditDefaultsOnly, Category = "Movement")
-	float DrivingForce = 40000; //TODO find sencible default
+	float DrivingForce = 2500000.0f; //TODO find sencible default
 
 	//Input variable
 	FVector2D InputMovement;
+
+	UHoverComponent* HoverComponent = nullptr;
 
 
 	

@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "DroidBody.h"
+#include "HoverComponent.h"
 
 // Sets default values
 UDroidBody::UDroidBody()
@@ -9,8 +10,8 @@ UDroidBody::UDroidBody()
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-
-void UDroidBody::OnHit(UPrimitiveComponent * HitComponent, AActor * OthetActor, UPrimitiveComponent * OtherComponent, FVector NormalImpulse, const FHitResult & Hit)
+//Move when hover is working
+void UDroidBody::OnHover()
 {
 	MoveForward();
 	MoveRight();
@@ -19,7 +20,8 @@ void UDroidBody::OnHit(UPrimitiveComponent * HitComponent, AActor * OthetActor, 
 void UDroidBody::BeginPlay()
 {
 	Super::BeginPlay();
-	OnComponentHit.AddDynamic(this, &UDroidBody::OnHit);
+	HoverComponent = GetOwner()->FindComponentByClass<UHoverComponent>();
+	HoverComponent->OnHover.AddDynamic(this, &UDroidBody::OnHover);
 }
 
 void UDroidBody::SetDirectInputMovement(float Throw)
