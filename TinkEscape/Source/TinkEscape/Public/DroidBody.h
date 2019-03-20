@@ -7,8 +7,9 @@
 #include "DroidBody.generated.h"
 
 /**
- * 
+ * Component which represnts physics body of droid, which actualy is anti-gravity pillow
  */
+
 UCLASS(meta = (BlueprintSpawnableComponent))
 class TINKESCAPE_API UDroidBody : public UStaticMeshComponent
 {
@@ -38,6 +39,7 @@ private:
 
 	//Input variable
 	FVector2D InputMovement;
+
 
 	
 };
