@@ -15,11 +15,13 @@ void UDroidBody::OnHover()
 {
 	MoveForward();
 	MoveRight();
+	InputMovement.X = 0.0f;
+	InputMovement.Y = 0.0f;
 }
 
 void UDroidBody::BeginPlay()
 {
-	Super::BeginPlay();
+	Super::BeginPlay();	
 	HoverComponent = GetOwner()->FindComponentByClass<UHoverComponent>();
 	HoverComponent->OnHover.AddDynamic(this, &UDroidBody::OnHover);
 }
