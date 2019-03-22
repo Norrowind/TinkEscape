@@ -2,6 +2,7 @@
 
 #include "HoverComponent.h"
 #include "DroidBody.h"
+#include "Classes/Particles/ParticleSystemComponent.h"
 #include "Classes/Engine/World.h"
 
 // Sets default values for this component's properties
@@ -19,8 +20,11 @@ UHoverComponent::UHoverComponent()
 void UHoverComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
 	DroidBody = GetOwner()->FindComponentByClass<UDroidBody>();
 	DroidBody->SetSimulatePhysics(true);
+	HoveringParticle = GetOwner()->FindComponentByClass<UParticleSystemComponent>();
+	HoveringParticle->bAutoActivate = false;
 }
 
 
@@ -34,8 +38,32 @@ void UHoverComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 void UHoverComponent::Hover()
 {
 	FHitResult OutHitResult;
-	//Tracing a ray to the ground
-	bool bIsBlockingHitFound = GetWorld()->LineTraceSingleByChannel
+	if (IsBelowToTheGroundEnoughToHover(OutHitResult))
+	{
+		ActivateHover(OutHitResult);
+	}
+	else
+	{	
+		HoveringParticle->Deactivate();
+		DroidBody->SetLinearDamping(NormalLinearDamping);
+		DroidBody->SetAngularDamping(NormalAngularDamping);
+	}
+}
+
+void UHoverComponent::ActivateHover(const FHitResult HitResult )
+{
+	ForceToApply = ForceToHover;
+	ApplyForceToHover(HitResult);
+	DroidBody->SetLinearDamping(LinearHoverDamping);
+	DroidBody->SetAngularDamping(AngularHoverDamping);
+	HoveringParticle->Activate();
+	OnHover.Broadcast();
+}
+
+//Tracing a ray to the ground
+bool UHoverComponent::IsBelowToTheGroundEnoughToHover(FHitResult & OutHitResult)
+{
+	return GetWorld()->LineTraceSingleByChannel
 	(
 		OutHitResult,
 		DroidBody->GetComponentLocation(),
@@ -44,23 +72,21 @@ void UHoverComponent::Hover()
 		FCollisionQueryParams::DefaultQueryParam.bTraceComplex = true,
 		FCollisionResponseParams::DefaultResponseParam
 	);
+}
 
-	float DistanceFromGround = (OutHitResult.Location - DroidBody->GetComponentLocation()).Size(); //get the length of vector
-	float InterpolationResult = FMath::Lerp(ForceToHover, 0.0f, DistanceFromGround / TraceLength);
-	FVector ForceToApply = OutHitResult.ImpactNormal * InterpolationResult;
+void UHoverComponent::ApplyForceToHover(const FHitResult HitResult)
+{
+	float DistanceFromGround = (HitResult.Location - DroidBody->GetComponentLocation()).Size(); //get the length of vector
+	float InterpolationResult = FMath::Lerp(ForceToApply, 0.0f, DistanceFromGround / TraceLength);
+	FVector VectorHoveringForce = HitResult.ImpactNormal * InterpolationResult;
+	if (!ensure(DroidBody)) { return; }
+	DroidBody->AddForce(VectorHoveringForce);
+}
 
-	if (bIsBlockingHitFound)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("BlockingHitFound"))
-			OnHover.Broadcast();
-		if (!ensure(DroidBody)) { return; }
-		DroidBody->AddForce(ForceToApply);
-		DroidBody->SetLinearDamping(LinearHoverDamping);
-		DroidBody->SetAngularDamping(AngularHoverDamping);
-	}
-	else
-	{
-		DroidBody->SetLinearDamping(NormalLinearDamping);
-		DroidBody->SetAngularDamping(NormalAngularDamping);
-	}
+void UHoverComponent::DeactivateHover()
+{
+	ForceToApply = 0.0f;
+	DroidBody->SetLinearDamping(NormalLinearDamping);
+	DroidBody->SetAngularDamping(NormalAngularDamping);
+	HoveringParticle->Deactivate();
 }

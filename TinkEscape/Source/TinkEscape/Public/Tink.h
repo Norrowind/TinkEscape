@@ -11,8 +11,6 @@ class USpringArmComponent;
 class UCameraComponent;
 class UDroidMovementComponent;
 class UDroidBody;
-class UStaticMeshComponent;
-class UHoverComponent;
 
 UCLASS()
 class TINKESCAPE_API ATink : public APawn
@@ -41,10 +39,6 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, Category = "Setup")
 	USceneComponent* AzimuthGimbal = nullptr;
-
-	UPROPERTY(VisibleAnywhere, Category = "Setup")
-	UHoverComponent* HoverComponent = nullptr;
-
 
 public:	
 	// Called to bind functionality to input

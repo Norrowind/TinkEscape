@@ -6,7 +6,7 @@
 #include "Components/InputComponent.h"
 #include "DroidMovementComponent.h"
 #include "DroidBody.h"
-#include "HoverComponent.h"
+
 
 // Sets default values
 ATink::ATink()
@@ -30,8 +30,7 @@ ATink::ATink()
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	CameraComponent->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
 
-	DroidMovementComponent = CreateDefaultSubobject<UDroidMovementComponent>(TEXT("MovingComponent"));
-	
+	DroidMovementComponent = CreateDefaultSubobject<UDroidMovementComponent>(TEXT("MovingComponent"));	
 
 }
 

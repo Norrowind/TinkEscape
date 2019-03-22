@@ -9,6 +9,7 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnHover);
 
 class UDroidBody;
+class UParticleSystemComponent;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class TINKESCAPE_API UHoverComponent : public USceneComponent
@@ -32,8 +33,16 @@ public:
 private:
 	
 	UDroidBody* DroidBody = nullptr;
+	UParticleSystemComponent* HoveringParticle = nullptr;
+
 	void Hover();
-	
+	void ActivateHover(const FHitResult HitResult);
+	void DeactivateHover();
+	bool IsBelowToTheGroundEnoughToHover(FHitResult& OutHitResult);
+	void ApplyForceToHover(const FHitResult HitResult);
+
+	float ForceToApply;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Setup")
 	float TraceLength = 50.0f;
 
