@@ -44,6 +44,15 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	//Energy which Tink uses for jumps and kinetic gun, initialize in begin play
+	float KineticEnergy;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Kinetic Energy")
+	float KineticEnergyRestorePerSecond = 5.0f;
+
+	//Called every frame
+	virtual void Tick(float DeltaTime) override;
+
 private:
 	//Functions to camera input
 	void CameraPitch(float AxisValue);

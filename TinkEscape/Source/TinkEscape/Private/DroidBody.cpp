@@ -42,14 +42,14 @@ void UDroidBody::SetSideInputMovement(float Throw)
 void UDroidBody::MoveForward()
 {
 	auto ForceApplied = GetForwardVector() * InputMovement.X * DrivingForce;
-	this->AddForce(ForceApplied);
+	AddForce(ForceApplied);
 }
 
 //Handle movement by adding force right and left
 void UDroidBody::MoveRight()
 {
 	auto ForceApplied = GetRightVector() * InputMovement.Y * DrivingForce;
-	this->AddForce(ForceApplied);
+	AddForce(ForceApplied);
 }
 
 

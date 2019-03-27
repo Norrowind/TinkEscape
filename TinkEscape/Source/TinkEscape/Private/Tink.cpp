@@ -12,7 +12,7 @@
 ATink::ATink()
 {
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Default Root Component"));
 	DroidBody = CreateDefaultSubobject<UDroidBody>(TEXT("Droid Body"));
 	DroidBody->SetupAttachment(RootComponent);
@@ -38,7 +38,16 @@ ATink::ATink()
 void ATink::BeginPlay()
 {
 	Super::BeginPlay();
+	KineticEnergy = 100.0f;
+}
 
+void ATink::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	//Always restore kinetick energy
+	KineticEnergy = FMath::Clamp(KineticEnergy + (KineticEnergyRestorePerSecond * DeltaTime), 0.0f, 100.0f);
+	UE_LOG(LogTemp, Warning, TEXT("Kinetic Enegry: %f"), KineticEnergy)
 }
 
 // Called to bind functionality to input
@@ -50,7 +59,10 @@ void ATink::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAxis("CameraYaw", this, &ATink::CameraYaw);
 	PlayerInputComponent->BindAxis("MoveForward", DroidMovementComponent, &UDroidMovementComponent::IntendMoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", DroidMovementComponent, &UDroidMovementComponent::IntendMoveRight);
+	PlayerInputComponent->BindAction("Jump", IE_Pressed, DroidMovementComponent, &UDroidMovementComponent::PowerUpJump);
+	PlayerInputComponent->BindAction("Jump", IE_Released, DroidMovementComponent, &UDroidMovementComponent::StartJump);
 }
+
 
 void ATink::CameraPitch(float AxisValue)
 {

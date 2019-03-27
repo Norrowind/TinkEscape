@@ -1,12 +1,18 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "DroidMovementComponent.h"
+#include "Classes/Engine/World.h"
+#include "Public/TimerManager.h"
 #include "DroidBody.h"
+#include "Tink.h"
+#include "HoverComponent.h"
 
 void UDroidMovementComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	DroidBody = GetOwner()->FindComponentByClass<UDroidBody>();
+	HoverComponent = GetOwner()->FindComponentByClass<UHoverComponent>();
+	Tink = Cast<ATink>(GetOwner());
 }
 
 void UDroidMovementComponent::IntendMoveForward(float AxisValue)
@@ -19,4 +25,23 @@ void UDroidMovementComponent::IntendMoveRight(float AxisValue)
 {
 	if (!ensure(DroidBody)) { return; }
 	DroidBody->SetSideInputMovement(AxisValue);
+}
+
+void UDroidMovementComponent::PowerUpJump()
+{
+	GetWorld()->GetTimerManager().SetTimer(JumpPowerTimer, 15.0f, false);
+
+}
+
+void UDroidMovementComponent::StartJump()
+{
+	float RawKineticEnergySpent = GetWorld()->GetTimerManager().GetTimerElapsed(JumpPowerTimer) * MinKineticEnergyJumpCost;
+	KineticEnergySpent = FMath::Clamp(RawKineticEnergySpent, 0.0f, Tink->KineticEnergy);
+	Tink->KineticEnergy -= KineticEnergySpent;
+	GetWorld()->GetTimerManager().ClearTimer(JumpPowerTimer);
+	DroidBody->SetLinearDamping(0.3f);
+	DroidBody->SetAngularDamping(0.6f);
+	FVector ForceForJump = DroidBody->GetUpVector() * MinForceToApplyForJump * (KineticEnergySpent * JumpForceMultiplier);
+	DroidBody->AddForce(ForceForJump);
+
 }

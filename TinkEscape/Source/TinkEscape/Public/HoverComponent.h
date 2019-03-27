@@ -60,6 +60,5 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Setup")
 	float NormalAngularDamping = 0.6f;
-
 		
 };
