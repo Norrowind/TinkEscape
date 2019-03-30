@@ -38,7 +38,7 @@ ATink::ATink()
 void ATink::BeginPlay()
 {
 	Super::BeginPlay();
-	KineticEnergy = 100.0f;
+	KineticEnergy = StartingKineticEnergy;
 }
 
 void ATink::Tick(float DeltaTime)
@@ -46,8 +46,23 @@ void ATink::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	//Always restore kinetick energy
-	KineticEnergy = FMath::Clamp(KineticEnergy + (KineticEnergyRestorePerSecond * DeltaTime), 0.0f, 100.0f);
+	KineticEnergy = FMath::Clamp(KineticEnergy + (KineticEnergyRestorePerSecond * DeltaTime), 0, StartingKineticEnergy);
 	UE_LOG(LogTemp, Warning, TEXT("Kinetic Enegry: %f"), KineticEnergy)
+}
+
+void ATink::SetKinetickEnergyExpend(float KinetickEnergyExpand)
+{
+	KineticEnergy -= KinetickEnergyExpand;
+}
+
+float ATink::GetKineticEnergyPercent()
+{
+	return (float)KineticEnergy / (float)StartingKineticEnergy;
+}
+
+int32 ATink::GetKineticEnergy()
+{
+	return KineticEnergy;
 }
 
 // Called to bind functionality to input

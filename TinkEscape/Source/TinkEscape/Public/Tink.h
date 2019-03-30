@@ -44,14 +44,15 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	//Energy which Tink uses for jumps and kinetic gun, initialize in begin play
-	float KineticEnergy;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Kinetic Energy")
-	float KineticEnergyRestorePerSecond = 5.0f;
-
 	//Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	void SetKinetickEnergyExpend(float KinetickEnergyExpand);
+
+	UFUNCTION(BlueprintPure, Category = "Setup")
+	float GetKineticEnergyPercent();
+
+	int32 GetKineticEnergy();
 
 private:
 	//Functions to camera input
@@ -64,4 +65,11 @@ private:
 	//Component default Parametrs
 	FVector SpringArmLocation = FVector(0.0f, 0.0f, 50.0f);
 	float SpringArmLength = 400.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Kinetic Energy")
+	int32 KineticEnergyRestorePerSecond = 5;
+
+	//Energy which Tink uses for jumps and kinetic gun, initialize in begin play
+	int32 KineticEnergy;
+	int32 StartingKineticEnergy = 100;
 };
