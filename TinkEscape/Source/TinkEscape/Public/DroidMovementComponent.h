@@ -41,10 +41,10 @@ private:
 	//Timer which handle power of jump based on, how long jump button pressed
 	FTimerHandle JumpPowerTimer;
 	
-	int32 KineticEnergySpentForJump;
+	float KineticEnergySpentForJump;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Jumping")
-	int32 KineticEnergyJumpCostForSecond = 50;
+	float KineticEnergyJumpCostForSecond = 50;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Jumping")
 	float MinForceToApplyForJump = 2000000.0f;

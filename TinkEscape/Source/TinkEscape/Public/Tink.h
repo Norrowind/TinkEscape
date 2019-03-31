@@ -52,7 +52,7 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Setup")
 	float GetKineticEnergyPercent();
 
-	int32 GetKineticEnergy();
+	float GetKineticEnergy();
 
 private:
 	//Functions to camera input
@@ -67,9 +67,9 @@ private:
 	float SpringArmLength = 400.0f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Kinetic Energy")
-	int32 KineticEnergyRestorePerSecond = 5;
+	float KineticEnergyRestorePerSecond = 5.0f;
 
 	//Energy which Tink uses for jumps and kinetic gun, initialize in begin play
-	int32 KineticEnergy;
-	int32 StartingKineticEnergy = 100;
+	float KineticEnergy;
+	float StartingKineticEnergy = 100.0f;
 };
