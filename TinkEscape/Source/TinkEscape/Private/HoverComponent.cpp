@@ -63,15 +63,22 @@ void UHoverComponent::ActivateHover(const FHitResult HitResult )
 //Tracing a ray to the ground
 bool UHoverComponent::IsBelowToTheGroundEnoughToHover(FHitResult & OutHitResult)
 {
-	return GetWorld()->LineTraceSingleByChannel
-	(
-		OutHitResult,
-		DroidBody->GetComponentLocation(),
-		DroidBody->GetComponentLocation() - FVector(0.0f, 0.0f, TraceLength),
-		ECollisionChannel::ECC_Visibility,
-		FCollisionQueryParams::DefaultQueryParam.bTraceComplex = true,
-		FCollisionResponseParams::DefaultResponseParam
-	);
+	if (ensure(DroidBody))
+	{
+		return GetWorld()->LineTraceSingleByChannel
+		(
+			OutHitResult,
+			DroidBody->GetComponentLocation(),
+			DroidBody->GetComponentLocation() - FVector(0.0f, 0.0f, TraceLength),
+			ECollisionChannel::ECC_Visibility,
+			FCollisionQueryParams::DefaultQueryParam.bTraceComplex = true,
+			FCollisionResponseParams::DefaultResponseParam
+		);
+	}
+	else
+	{
+		return false;
+	}
 }
 
 void UHoverComponent::ApplyForceToHover(const FHitResult HitResult)
@@ -85,6 +92,7 @@ void UHoverComponent::ApplyForceToHover(const FHitResult HitResult)
 
 void UHoverComponent::DeactivateHover()
 {
+	if (!ensure(DroidBody)) { return; }
 	ForceToApply = 0.0f;
 	DroidBody->SetLinearDamping(NormalLinearDamping);
 	DroidBody->SetAngularDamping(NormalAngularDamping);

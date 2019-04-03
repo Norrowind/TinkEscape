@@ -34,12 +34,14 @@ void UDroidMovementComponent::PowerUpJump()
 }
 
 void UDroidMovementComponent::StartJump()
-{
+{	
+	if (!ensure(Tink && DroidBody)) { return; }
 	float RawKineticEnergySpentForJump = GetWorld()->GetTimerManager().GetTimerElapsed(JumpPowerTimer) * KineticEnergyJumpCostForSecond;
 	KineticEnergySpentForJump = FMath::Clamp(RawKineticEnergySpentForJump, 0.0f, Tink->GetKineticEnergy());
 	Tink->SetKinetickEnergyExpend(KineticEnergySpentForJump);
 
 	GetWorld()->GetTimerManager().ClearTimer(JumpPowerTimer);
+
 	DroidBody->SetLinearDamping(0.3f);
 	DroidBody->SetAngularDamping(0.6f);
 	FVector ForceForJump = DroidBody->GetUpVector() * MinForceToApplyForJump * KineticEnergySpentForJump;

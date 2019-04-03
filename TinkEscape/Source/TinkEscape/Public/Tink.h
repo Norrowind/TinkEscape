@@ -47,12 +47,12 @@ public:
 	//Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	void SetKinetickEnergyExpend(float KinetickEnergyExpand);
-
 	UFUNCTION(BlueprintPure, Category = "Setup")
-	float GetKineticEnergyPercent();
+	float GetKineticEnergyPercent() const;
 
-	float GetKineticEnergy();
+	float GetKineticEnergy() const;
+
+	void SetKinetickEnergyExpend(float KinetickEnergyExpand);
 
 private:
 	//Functions to camera input

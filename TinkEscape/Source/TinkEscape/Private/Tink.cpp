@@ -47,7 +47,7 @@ void ATink::Tick(float DeltaTime)
 
 	//Always restore kinetick energy
 	KineticEnergy = FMath::Clamp(KineticEnergy + (KineticEnergyRestorePerSecond * DeltaTime), 0.0f, StartingKineticEnergy);
-	UE_LOG(LogTemp, Warning, TEXT("Kinetic Enegry: %f"), KineticEnergy)
+
 }
 
 void ATink::SetKinetickEnergyExpend(float KinetickEnergyExpand)
@@ -55,12 +55,12 @@ void ATink::SetKinetickEnergyExpend(float KinetickEnergyExpand)
 	KineticEnergy -= KinetickEnergyExpand;
 }
 
-float ATink::GetKineticEnergyPercent()
+float ATink::GetKineticEnergyPercent() const
 {
 	return KineticEnergy / StartingKineticEnergy;
 }
 
-float ATink::GetKineticEnergy()
+float ATink::GetKineticEnergy() const
 {
 	return KineticEnergy;
 }
