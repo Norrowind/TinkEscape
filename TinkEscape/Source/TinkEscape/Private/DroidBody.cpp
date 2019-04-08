@@ -13,8 +13,16 @@ UDroidBody::UDroidBody()
 //Move when hover is working
 void UDroidBody::OnHover()
 {
-	MoveForward();
-	MoveRight();
+	MoveForward(DrivingForce);
+	MoveRight(DrivingForce);
+	InputMovement.X = 0.0f;
+	InputMovement.Y = 0.0f;
+}
+
+void UDroidBody::OnAir()
+{
+	MoveForward(AirDrivingForce);
+	MoveRight(AirDrivingForce);
 	InputMovement.X = 0.0f;
 	InputMovement.Y = 0.0f;
 }
@@ -24,6 +32,7 @@ void UDroidBody::BeginPlay()
 	Super::BeginPlay();	
 	HoverComponent = GetOwner()->FindComponentByClass<UHoverComponent>();
 	HoverComponent->OnHover.AddDynamic(this, &UDroidBody::OnHover);
+	HoverComponent->OnAir.AddDynamic(this, &UDroidBody::OnAir);
 }
 
 void UDroidBody::SetDirectInputMovement(float Throw)
@@ -39,14 +48,14 @@ void UDroidBody::SetSideInputMovement(float Throw)
 }
 
 //Handle movement by adding force forward and backward
-void UDroidBody::MoveForward()
+void UDroidBody::MoveForward(float DrivingForce)
 {
 	auto ForceApplied = GetForwardVector() * InputMovement.X * DrivingForce;
 	AddForce(ForceApplied);
 }
 
 //Handle movement by adding force right and left
-void UDroidBody::MoveRight()
+void UDroidBody::MoveRight(float DrivingForce)
 {
 	auto ForceApplied = GetRightVector() * InputMovement.Y * DrivingForce;
 	AddForce(ForceApplied);

@@ -7,6 +7,7 @@
 #include "HoverComponent.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnHover);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAir);
 
 class UDroidBody;
 class UParticleSystemComponent;
@@ -21,6 +22,7 @@ public:
 	UHoverComponent();
 
 	FOnHover OnHover;
+	FOnAir OnAir;
 
 protected:
 	// Called when the game starts

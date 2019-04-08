@@ -5,13 +5,12 @@
 #include "Public/TimerManager.h"
 #include "DroidBody.h"
 #include "Tink.h"
-#include "HoverComponent.h"
+#include "Classes/Particles/ParticleSystemComponent.h"
 
 void UDroidMovementComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	DroidBody = GetOwner()->FindComponentByClass<UDroidBody>();
-	HoverComponent = GetOwner()->FindComponentByClass<UHoverComponent>();
 	Tink = Cast<ATink>(GetOwner());
 }
 

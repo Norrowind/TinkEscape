@@ -54,9 +54,18 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Setup")
 	float GetKineticEnergyPercent() const;
 
+	UFUNCTION(BlueprintPure, Category = "Setup")
 	float GetKineticEnergy() const;
 
 	void SetKinetickEnergyExpend(float KinetickEnergyExpand);
+
+	UFUNCTION(BlueprintPure, Category = "Setup")
+	float GetBuildingEnergyPercent() const;
+
+	UFUNCTION(BlueprintPure, Category = "Setup")
+	int32 GetBuildingEnergy() const;
+
+	void SetBuildingEnergyExpend(int32 BuildingEnergyExpand);
 
 private:
 	//Functions to camera input
@@ -67,6 +76,8 @@ private:
 	void GunPressed();
 
 	void GunReleased();
+
+	void GunAlternativeAction();
 
 	//Input variable
 	FVector2D CameraInput;
@@ -81,4 +92,8 @@ private:
 	//Energy which Tink uses for jumps and kinetic gun, initialize in begin play
 	float KineticEnergy;
 	float StartingKineticEnergy = 100.0f;
+
+	//Energy which Tink use to build platforms, initialize in begin play
+	int32 BuildingEnergy;
+	int32 StartingBuildingEnergy = 100;
 };

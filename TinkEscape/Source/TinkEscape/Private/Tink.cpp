@@ -42,6 +42,7 @@ void ATink::BeginPlay()
 {
 	Super::BeginPlay();
 	KineticEnergy = StartingKineticEnergy;
+	BuildingEnergy = StartingBuildingEnergy;
 }
 
 void ATink::Tick(float DeltaTime)
@@ -56,6 +57,21 @@ void ATink::Tick(float DeltaTime)
 void ATink::SetKinetickEnergyExpend(float KinetickEnergyExpand)
 {
 	KineticEnergy -= KinetickEnergyExpand;
+}
+
+float ATink::GetBuildingEnergyPercent() const
+{
+	return (float)BuildingEnergy / (float)StartingBuildingEnergy;
+}
+
+int32 ATink::GetBuildingEnergy() const
+{
+	return BuildingEnergy;
+}
+
+void ATink::SetBuildingEnergyExpend(int32 BuildingEnergyExpand)
+{
+	BuildingEnergy -= BuildingEnergyExpand;
 }
 
 float ATink::GetKineticEnergyPercent() const
@@ -81,6 +97,7 @@ void ATink::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAction("Jump", IE_Released, DroidMovementComponent, &UDroidMovementComponent::StartJump);
 	PlayerInputComponent->BindAction("GunAction", IE_Pressed, this, &ATink::GunPressed);
 	PlayerInputComponent->BindAction("GunAction", IE_Released, this, &ATink::GunReleased);
+	PlayerInputComponent->BindAction("GunAlternativeAction", IE_Pressed, this, &ATink::GunAlternativeAction);
 }
 
 
@@ -106,4 +123,9 @@ void ATink::GunPressed()
 void ATink::GunReleased()
 {
 	BuildingComponent->PlaceReadyPlatform();
+}
+
+void ATink::GunAlternativeAction()
+{
+	BuildingComponent->ComsumeBuildingEnergy();
 }

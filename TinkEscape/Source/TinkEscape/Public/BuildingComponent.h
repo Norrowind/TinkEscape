@@ -7,6 +7,7 @@
 #include "BuildingComponent.generated.h"
 
 class ATinkController;
+class ATink;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class TINKESCAPE_API UBuildingComponent : public UActorComponent
@@ -29,6 +30,8 @@ public:
 
 	void PlaceReadyPlatform();
 
+	void ComsumeBuildingEnergy();
+
 private:
 
 	void MoveGhostPlatform();
@@ -38,10 +41,17 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Setup")
 	TSubclassOf<AActor>ReadyPlatform;
+
+	ATink* Tink = nullptr;
 	
 	ATinkController* TinkController = nullptr;
 
 	AActor* SpawnedGhostPlatform = nullptr;
 
 	bool bIsBuilding = false;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Setup")
+	int32 BuildingEnergyCost = 25;
+
+	int32 BuildingEnergyForPlatform = -15;
 };

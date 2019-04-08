@@ -13,7 +13,6 @@
 //Forward declaration
 class UDroidBody;
 class ATink;
-class UHoverComponent;
 
 UCLASS(meta = (BlueprintSpawnableComponent))
 class TINKESCAPE_API UDroidMovementComponent : public UNavMovementComponent
@@ -35,8 +34,6 @@ private:
 	UDroidBody* DroidBody = nullptr;
 
 	ATink* Tink = nullptr;
-
-	UHoverComponent* HoverComponent = nullptr;
 
 	//Timer which handle power of jump based on, how long jump button pressed
 	FTimerHandle JumpPowerTimer;

@@ -27,17 +27,23 @@ public:
 
 private:
 
-	void MoveForward();
-	void MoveRight();
+	void MoveForward(float DrivingForce);
+	void MoveRight(float DrivingForce);
 	
 	UFUNCTION()
 	void OnHover();
+
+	UFUNCTION()
+	void OnAir();
 
 	virtual void BeginPlay() override;
 	
 	//Driving force in Newtons
 	UPROPERTY(EditDefaultsOnly, Category = "Movement")
-	float DrivingForce = 2500000.0f; //TODO find sencible default
+	float DrivingForce = 2500000.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Movement")
+	float AirDrivingForce = 100000.0f;
 
 	//Input variable
 	FVector2D InputMovement;

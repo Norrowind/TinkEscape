@@ -3,6 +3,8 @@
 #include "BuildingComponent.h"
 #include "Classes/Engine/World.h"
 #include "TinkController.h"
+#include "Tink.h"
+#include "Classes/Components/StaticMeshComponent.h"
 
 // Sets default values for this component's properties
 UBuildingComponent::UBuildingComponent()
@@ -21,6 +23,7 @@ void UBuildingComponent::BeginPlay()
 	Super::BeginPlay();
 	
 	TinkController = Cast<ATinkController>(GetWorld()->GetFirstPlayerController());
+	Tink = Cast<ATink>(GetOwner());
 }
 
 
@@ -54,14 +57,35 @@ void UBuildingComponent::MoveGhostPlatform()
 
 void UBuildingComponent::PlaceReadyPlatform()
 {	
+	if (!ensure(Tink)) { return; }
+	if (!ensure(SpawnedGhostPlatform)) { return; }
 	FVector ReadyPlatformSpawnLocation = SpawnedGhostPlatform->GetActorLocation();
 	SpawnedGhostPlatform->Destroy();
-	GetWorld()->SpawnActor<AActor>
-		(
-			ReadyPlatform,
-			ReadyPlatformSpawnLocation,
-			FRotator::ZeroRotator
-		);
-	bIsBuilding = false;
+	if (Tink->GetBuildingEnergy() >= BuildingEnergyCost)
+	{
+		GetWorld()->SpawnActor<AActor>
+			(
+				ReadyPlatform,
+				ReadyPlatformSpawnLocation,
+				FRotator::ZeroRotator
+				);
+		bIsBuilding = false;
+		Tink->SetBuildingEnergyExpend(BuildingEnergyCost);
+	}
+	
+}
+
+void UBuildingComponent::ComsumeBuildingEnergy()
+{
+	if (TinkController->GetSightRayHitResult().GetActor())
+	{
+		auto Target = TinkController->GetSightRayHitResult().GetActor();
+		auto TargetName = Target->FindComponentByClass<UStaticMeshComponent>()->GetName();
+		if (TargetName == TEXT("ReadyPlatform"))
+		{
+			Target->Destroy();
+			Tink->SetBuildingEnergyExpend(BuildingEnergyForPlatform);
+		}
+	}
 }
 

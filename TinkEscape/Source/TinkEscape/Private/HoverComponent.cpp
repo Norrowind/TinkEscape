@@ -47,6 +47,7 @@ void UHoverComponent::Hover()
 		HoveringParticle->Deactivate();
 		DroidBody->SetLinearDamping(NormalLinearDamping);
 		DroidBody->SetAngularDamping(NormalAngularDamping);
+		OnAir.Broadcast();
 	}
 }
 
