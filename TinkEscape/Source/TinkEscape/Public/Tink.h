@@ -11,6 +11,7 @@ class USpringArmComponent;
 class UCameraComponent;
 class UDroidMovementComponent;
 class UDroidBody;
+class UBuildingComponent;
 
 UCLASS()
 class TINKESCAPE_API ATink : public APawn
@@ -40,6 +41,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Setup")
 	USceneComponent* AzimuthGimbal = nullptr;
 
+	UPROPERTY(VisibleAnywhere, Category = "Setup")
+	UBuildingComponent* BuildingComponent = nullptr;
+	
 public:	
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -58,6 +62,11 @@ private:
 	//Functions to camera input
 	void CameraPitch(float AxisValue);
 	void CameraYaw(float AxisValue);
+
+	//Functions for gun input events
+	void GunPressed();
+
+	void GunReleased();
 
 	//Input variable
 	FVector2D CameraInput;

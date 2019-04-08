@@ -6,6 +6,7 @@
 #include "Components/InputComponent.h"
 #include "DroidMovementComponent.h"
 #include "DroidBody.h"
+#include "BuildingComponent.h"
 
 
 // Sets default values
@@ -30,7 +31,9 @@ ATink::ATink()
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	CameraComponent->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
 
-	DroidMovementComponent = CreateDefaultSubobject<UDroidMovementComponent>(TEXT("MovingComponent"));	
+	DroidMovementComponent = CreateDefaultSubobject<UDroidMovementComponent>(TEXT("MovingComponent"));
+
+	BuildingComponent = CreateDefaultSubobject<UBuildingComponent>(TEXT("BuildingComponent"));
 
 }
 
@@ -76,6 +79,8 @@ void ATink::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAxis("MoveRight", DroidMovementComponent, &UDroidMovementComponent::IntendMoveRight);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, DroidMovementComponent, &UDroidMovementComponent::PowerUpJump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, DroidMovementComponent, &UDroidMovementComponent::StartJump);
+	PlayerInputComponent->BindAction("GunAction", IE_Pressed, this, &ATink::GunPressed);
+	PlayerInputComponent->BindAction("GunAction", IE_Released, this, &ATink::GunReleased);
 }
 
 
@@ -91,4 +96,14 @@ void ATink::CameraYaw(float AxisValue)
 	CameraInput.X = AxisValue;
 	if (!ensure(DroidBody)) { return; }
 	DroidBody->AddLocalRotation(FRotator(0.0f, CameraInput.X, 0.0f));
+}
+
+void ATink::GunPressed()
+{
+	BuildingComponent->PlaceGhostPlatform();
+}
+
+void ATink::GunReleased()
+{
+	BuildingComponent->PlaceReadyPlatform();
 }
