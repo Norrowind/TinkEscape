@@ -48,7 +48,7 @@ void UGunComponent::AimingAtLocation(FVector AimLocation)
 		ESuggestProjVelocityTraceOption::DoNotTrace,
 		FCollisionResponseParams::DefaultResponseParam,
 		TArray<AActor*>(),
-		true
+		false
 
 	);
 
