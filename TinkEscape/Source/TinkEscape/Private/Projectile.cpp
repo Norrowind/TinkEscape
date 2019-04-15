@@ -4,7 +4,9 @@
 #include "Classes/Particles/ParticleSystemComponent.h"
 #include "Classes/Components/StaticMeshComponent.h"
 #include "Classes/GameFramework/ProjectileMovementComponent.h"
-
+#include "Classes/PhysicsEngine/RadialForceComponent.h"
+#include "Classes/Engine/World.h"
+#include "Engine/Public/TimerManager.h"
 // Sets default values
 AProjectile::AProjectile()
 {
@@ -18,18 +20,24 @@ AProjectile::AProjectile()
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(FName("Projectile Movement"));
 	ProjectileMovement->bAutoActivate = false;
 
+	ExplosionForce = CreateDefaultSubobject<URadialForceComponent>(FName("Explosion Force"));
+	ExplosionForce->SetupAttachment(RootComponent);
+
 	LaunchParticle = CreateDefaultSubobject<UParticleSystemComponent>(FName("Launch Particle"));
-	AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+	LaunchParticle->SetupAttachment(RootComponent);
 
 	ExplosionParticle = CreateDefaultSubobject<UParticleSystemComponent>(FName("Explosion Particle"));
-	AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+	ExplosionParticle->SetupAttachment(RootComponent);
+	ExplosionParticle->bAutoActivate = false;
 }
 
 // Called when the game starts or when spawned
 void AProjectile::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	if (!ensure(CollisionMesh)) { return; }
+	CollisionMesh->OnComponentHit.AddDynamic(this, &AProjectile::OnHit);
 }
 
 // Called every frame
@@ -39,7 +47,33 @@ void AProjectile::Tick(float DeltaTime)
 
 }
 
-void AProjectile::OnHit(UPrimitiveComponent * HitComponent, AActor * OtherActor, UPrimitiveComponent * OtherComponent, FVector NormalImpulse, const FHitResult & Hit)
+void AProjectile::LaunchProjectile(float LaunchSpeed)
 {
+	if (!ensure(ProjectileMovement)) { return; }
+	ProjectileMovement->SetVelocityInLocalSpace(FVector::ForwardVector * LaunchSpeed);
+	ProjectileMovement->Activate();
+}
+
+void AProjectile::SetProjectileImpulseStrength(float ImpulseStrength)
+{
+	if (!ensure(ExplosionForce)) { return; }
+	ExplosionForce->ImpulseStrength = ImpulseStrength;
+}
+
+//Called when Projectile hit something
+void AProjectile::OnHit(UPrimitiveComponent * HitComponent, AActor * OtherActor, UPrimitiveComponent * OtherComponent, FVector NormalImpulse, const FHitResult & Hit)
+{	
+	if (!ensure(LaunchParticle && ExplosionParticle && ExplosionForce)) {return;}
+	LaunchParticle->Deactivate();
+	ExplosionParticle->Activate();
+	ExplosionForce->FireImpulse();
+
+	FTimerHandle DestroyTimer;
+	GetWorld()->GetTimerManager().SetTimer(DestroyTimer, this, &AProjectile::OnTimeToDestroy, DestroyDelay);
+}
+
+void AProjectile::OnTimeToDestroy()
+{
+	Destroy();
 }
 

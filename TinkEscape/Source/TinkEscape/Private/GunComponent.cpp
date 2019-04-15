@@ -4,6 +4,7 @@
 #include "TinkController.h"
 #include "Classes/Engine/World.h"
 #include "Kismet/GameplayStatics.h"
+#include "Projectile.h"
 
 // Sets default values for this component's properties
 UGunComponent::UGunComponent()
@@ -26,8 +27,26 @@ void UGunComponent::BeginPlay()
 void UGunComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	AimingAtLocation(TinkController->GetSightRayHitResult().TraceEnd);
+	if (ensure(TinkController))
+	{
+		AimingAtLocation(TinkController->GetSightRayHitResult().TraceEnd);
+	}
 
+}
+
+void UGunComponent::Fire(TSubclassOf<AProjectile>ProjectileToLaunch)
+{
+	if (!ensure(ProjectileToLaunch)) { return; }
+
+	//Spawn projectile on the socket location of gun
+	AProjectile* Projectile = GetWorld()->SpawnActor<AProjectile>
+		(
+			ProjectileToLaunch,
+			GetSocketLocation(FName("Projectile")),
+			GetSocketRotation(FName("Projectile"))
+		);
+	if (!ensure(Projectile)) { return; }
+	Projectile->LaunchProjectile(LaunchSpeed);
 }
 
 //Get tracing end point and elevate guns to aim on it

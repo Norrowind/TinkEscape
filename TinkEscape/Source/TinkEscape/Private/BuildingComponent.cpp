@@ -5,6 +5,7 @@
 #include "TinkController.h"
 #include "Tink.h"
 #include "Classes/Components/StaticMeshComponent.h"
+#include "GunComponent.h"
 
 // Sets default values for this component's properties
 UBuildingComponent::UBuildingComponent()
@@ -24,6 +25,8 @@ void UBuildingComponent::BeginPlay()
 	
 	TinkController = Cast<ATinkController>(GetWorld()->GetFirstPlayerController());
 	Tink = Cast<ATink>(GetOwner());
+	Gun = GetOwner()->FindComponentByClass<UGunComponent>();
+	
 }
 
 
@@ -47,6 +50,7 @@ void UBuildingComponent::PlaceGhostPlatform()
 		TinkController->GetSightRayHitResult().TraceEnd,
 		FRotator::ZeroRotator
 	);
+	SpawnedGhostPlatform->FindComponentByClass<UStaticMeshComponent>()->OnComponentHit.AddDynamic(this, &UBuildingComponent::OnGhostPlatformHit);
 	bIsBuilding = true;
 }
 
@@ -57,23 +61,40 @@ void UBuildingComponent::MoveGhostPlatform()
 
 void UBuildingComponent::PlaceReadyPlatform()
 {	
+	bIsBuilding = false;
+	if (!ensure(Gun)) { return; }
+	if (Tink->GetBuildingEnergy() >= BuildingEnergyCost)
+	{
+		Gun->Fire(BuildingProjectile);
+	}
+	else
+	{
+		SpawnedGhostPlatform->Destroy();
+	}
+
+}
+
+void UBuildingComponent::OnGhostPlatformHit(UPrimitiveComponent * HitComponent, AActor * OtherActor, UPrimitiveComponent * OtherComponent, FVector NormalImpulse, const FHitResult & Hit)
+{
 	if (!ensure(Tink)) { return; }
 	if (!ensure(SpawnedGhostPlatform)) { return; }
 	FVector ReadyPlatformSpawnLocation = SpawnedGhostPlatform->GetActorLocation();
+	SpawnedReadyPlatform = GetWorld()->SpawnActor<AActor>
+		(
+			ReadyPlatform,
+			ReadyPlatformSpawnLocation,
+			FRotator::ZeroRotator
+			);
+	SpawnedReadyPlatform->FindComponentByClass<UStaticMeshComponent>()->OnComponentHit.AddDynamic(this, &UBuildingComponent::OnReadyPlatformHit);
+	Tink->SetBuildingEnergyExpend(BuildingEnergyCost);
 	SpawnedGhostPlatform->Destroy();
-	if (Tink->GetBuildingEnergy() >= BuildingEnergyCost)
-	{
-		GetWorld()->SpawnActor<AActor>
-			(
-				ReadyPlatform,
-				ReadyPlatformSpawnLocation,
-				FRotator::ZeroRotator
-				);
-		bIsBuilding = false;
-		Tink->SetBuildingEnergyExpend(BuildingEnergyCost);
-	}
-	
 }
+
+void UBuildingComponent::OnReadyPlatformHit(UPrimitiveComponent * HitComponent, AActor * OtherActor, UPrimitiveComponent * OtherComponent, FVector NormalImpulse, const FHitResult & Hit)
+{
+
+}
+
 
 void UBuildingComponent::ComsumeBuildingEnergy()
 {

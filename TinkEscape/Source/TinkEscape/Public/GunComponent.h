@@ -12,11 +12,16 @@
 
 //Forward declaration
 class ATinkController;
+class AProjectile;
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class TINKESCAPE_API UGunComponent : public UStaticMeshComponent
 {
 	GENERATED_BODY()
+
+public:
+	
+	void Fire(TSubclassOf<AProjectile>ProjectileToLaunch);
 
 private:
 

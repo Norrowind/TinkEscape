@@ -10,6 +10,7 @@
 class UProjectileMovementComponent;
 class UParticleSystemComponent;
 class UStaticMeshComponent;
+class URadialForceComponent;
 
 UCLASS()
 class TINKESCAPE_API AProjectile : public AActor
@@ -28,10 +29,16 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	void LaunchProjectile(float LaunchSpeed);
+
+	void SetProjectileImpulseStrength(float ImpulseStrength);
+
 private:
 
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
+
+	void OnTimeToDestroy();
 
 	UPROPERTY(VisibleAnywhere, Category = "Setup")
 	UStaticMeshComponent* CollisionMesh = nullptr;
@@ -44,6 +51,13 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = "Setup")
 	UParticleSystemComponent* ExplosionParticle = nullptr;
+
+	UPROPERTY(VisibleAnywhere, Category = "Setup")
+	URadialForceComponent* ExplosionForce = nullptr;
+
+	float DestroyDelay = 1.0f;
+
+
 
 
 

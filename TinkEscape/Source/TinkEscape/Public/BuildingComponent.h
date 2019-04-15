@@ -8,6 +8,8 @@
 
 class ATinkController;
 class ATink;
+class AProjectile;
+class UGunComponent;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class TINKESCAPE_API UBuildingComponent : public UActorComponent
@@ -36,15 +38,31 @@ private:
 
 	void MoveGhostPlatform();
 
+	UFUNCTION()
+	void OnGhostPlatformHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
+
+	UFUNCTION()
+	void OnReadyPlatformHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
+
 	UPROPERTY(EditAnywhere, Category = "Setup")
 	TSubclassOf<AActor>GhostPlatform;
 
 	UPROPERTY(EditAnywhere, Category = "Setup")
 	TSubclassOf<AActor>ReadyPlatform;
 
+	UPROPERTY(EditAnywhere, Category = "Setup")
+	TSubclassOf<AProjectile>BuildingProjectile;
+
+	UPROPERTY(EditAnywhere, Category = "Setup")
+	TSubclassOf<AProjectile>ConsumeProjectile;
+
 	ATink* Tink = nullptr;
 	
 	ATinkController* TinkController = nullptr;
+
+	UGunComponent* Gun = nullptr;
+
+	AActor* SpawnedReadyPlatform = nullptr;
 
 	AActor* SpawnedGhostPlatform = nullptr;
 
