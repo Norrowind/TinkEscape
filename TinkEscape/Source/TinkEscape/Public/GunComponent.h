@@ -19,10 +19,6 @@ class TINKESCAPE_API UGunComponent : public UStaticMeshComponent
 {
 	GENERATED_BODY()
 
-public:
-	
-	void Fire(TSubclassOf<AProjectile>ProjectileToLaunch);
-
 private:
 
 	UGunComponent();

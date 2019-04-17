@@ -30,19 +30,19 @@ public:
 
 	void PlaceGhostPlatform();
 
-	void PlaceReadyPlatform();
+	void PlatformBuildShot();
 
-	void ComsumeBuildingEnergy();
+	void ComsumePlatformShot();
+
+	UFUNCTION(BlueprintCallable, Category = "BuildingGun")
+	void OnBuildingHit(AActor * OtherActor);
+
+	UFUNCTION(BlueprintCallable, Category = "BuildingGun")
+	void OnConsumeHit(AActor * OtherActor);
 
 private:
 
 	void MoveGhostPlatform();
-
-	UFUNCTION()
-	void OnGhostPlatformHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
-
-	UFUNCTION()
-	void OnReadyPlatformHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
 
 	UPROPERTY(EditAnywhere, Category = "Setup")
 	TSubclassOf<AActor>GhostPlatform;
@@ -62,14 +62,24 @@ private:
 
 	UGunComponent* Gun = nullptr;
 
-	AActor* SpawnedReadyPlatform = nullptr;
-
 	AActor* SpawnedGhostPlatform = nullptr;
+
+	FString GhostPlatformName;
+	FString ReadyPlatformName;
 
 	bool bIsBuilding = false;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Setup")
 	int32 BuildingEnergyCost = 25;
 
-	int32 BuildingEnergyForPlatform = -15;
+	//Should be negative
+	UPROPERTY(EditDefaultsOnly, Category = "Setup")
+	int32 BuildingEnergyForPlatformConsume = -15;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Setup")
+	float BuildShotLaunchSpeed = 7000.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Setup")
+	float ConsumeShotLaunchSpeed = 7000.0f;
+
 };

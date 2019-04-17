@@ -122,10 +122,10 @@ void ATink::GunPressed()
 
 void ATink::GunReleased()
 {
-	BuildingComponent->PlaceReadyPlatform();
+	BuildingComponent->PlatformBuildShot();
 }
 
 void ATink::GunAlternativeAction()
 {
-	BuildingComponent->ComsumeBuildingEnergy();
+	BuildingComponent->ComsumePlatformShot();
 }

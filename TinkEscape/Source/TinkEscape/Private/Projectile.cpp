@@ -64,6 +64,7 @@ void AProjectile::SetProjectileImpulseStrength(float ImpulseStrength)
 void AProjectile::OnHit(UPrimitiveComponent * HitComponent, AActor * OtherActor, UPrimitiveComponent * OtherComponent, FVector NormalImpulse, const FHitResult & Hit)
 {	
 	if (!ensure(LaunchParticle && ExplosionParticle && ExplosionForce)) {return;}
+	OnProjectileHitSpecialAction.Broadcast(OtherActor);
 	LaunchParticle->Deactivate();
 	ExplosionParticle->Activate();
 	ExplosionForce->FireImpulse();
@@ -74,6 +75,7 @@ void AProjectile::OnHit(UPrimitiveComponent * HitComponent, AActor * OtherActor,
 
 void AProjectile::OnTimeToDestroy()
 {
+	OnProjectileHitSpecialAction.RemoveAll(this);
 	Destroy();
 }
 

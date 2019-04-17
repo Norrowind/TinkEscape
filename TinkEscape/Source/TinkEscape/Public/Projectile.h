@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "Projectile.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnProjectileHit, AActor*, OtherActor);
+
 //Forward declaration
 class UProjectileMovementComponent;
 class UParticleSystemComponent;
@@ -33,6 +35,9 @@ public:
 
 	void SetProjectileImpulseStrength(float ImpulseStrength);
 
+	UPROPERTY(BlueprintAssignable, Category = "Projectile")
+	FOnProjectileHit OnProjectileHitSpecialAction;
+
 private:
 
 	UFUNCTION()
@@ -55,7 +60,7 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Setup")
 	URadialForceComponent* ExplosionForce = nullptr;
 
-	float DestroyDelay = 1.0f;
+	float DestroyDelay = 0.5f;
 
 
 

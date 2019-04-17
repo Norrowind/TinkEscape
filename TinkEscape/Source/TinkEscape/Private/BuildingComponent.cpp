@@ -2,10 +2,12 @@
 
 #include "BuildingComponent.h"
 #include "Classes/Engine/World.h"
+#include "Public/TimerManager.h"
 #include "TinkController.h"
 #include "Tink.h"
 #include "Classes/Components/StaticMeshComponent.h"
 #include "GunComponent.h"
+#include "Projectile.h"
 
 // Sets default values for this component's properties
 UBuildingComponent::UBuildingComponent()
@@ -26,7 +28,7 @@ void UBuildingComponent::BeginPlay()
 	TinkController = Cast<ATinkController>(GetWorld()->GetFirstPlayerController());
 	Tink = Cast<ATink>(GetOwner());
 	Gun = GetOwner()->FindComponentByClass<UGunComponent>();
-	
+
 }
 
 
@@ -50,7 +52,7 @@ void UBuildingComponent::PlaceGhostPlatform()
 		TinkController->GetSightRayHitResult().TraceEnd,
 		FRotator::ZeroRotator
 	);
-	SpawnedGhostPlatform->FindComponentByClass<UStaticMeshComponent>()->OnComponentHit.AddDynamic(this, &UBuildingComponent::OnGhostPlatformHit);
+	GhostPlatformName = SpawnedGhostPlatform->FindComponentByClass<UStaticMeshComponent>()->GetName();
 	bIsBuilding = true;
 }
 
@@ -59,13 +61,29 @@ void UBuildingComponent::MoveGhostPlatform()
 	SpawnedGhostPlatform->TeleportTo(TinkController->GetSightRayHitResult().TraceEnd, FRotator::ZeroRotator);
 }
 
-void UBuildingComponent::PlaceReadyPlatform()
+//Shot building projectile and bind platform build logic
+void UBuildingComponent::PlatformBuildShot()
 {	
 	bIsBuilding = false;
 	if (!ensure(Gun)) { return; }
+	if (!ensure(Tink)) { return; }
+
 	if (Tink->GetBuildingEnergy() >= BuildingEnergyCost)
 	{
-		Gun->Fire(BuildingProjectile);
+		if (!ensure(BuildingProjectile)) { return; }
+
+		//Spawn projectile on the socket location of gun
+		AProjectile* SpawnedProjectile = GetWorld()->SpawnActor<AProjectile>
+			(
+				BuildingProjectile,
+				Gun->GetSocketLocation(FName("Projectile")),
+				Gun->GetSocketRotation(FName("Projectile"))
+			);
+		if (SpawnedProjectile)
+		{
+			SpawnedProjectile->OnProjectileHitSpecialAction.AddDynamic(this, &UBuildingComponent::OnBuildingHit);
+			SpawnedProjectile->LaunchProjectile(BuildShotLaunchSpeed);
+		}
 	}
 	else
 	{
@@ -74,39 +92,68 @@ void UBuildingComponent::PlaceReadyPlatform()
 
 }
 
-void UBuildingComponent::OnGhostPlatformHit(UPrimitiveComponent * HitComponent, AActor * OtherActor, UPrimitiveComponent * OtherComponent, FVector NormalImpulse, const FHitResult & Hit)
+//Spawning Ready Platform when projectile hit Ghost Platform
+void UBuildingComponent::OnBuildingHit(AActor * HittedActor)
 {
+	UE_LOG(LogTemp, Warning, TEXT("OnBuildingHit called"))
+
 	if (!ensure(Tink)) { return; }
 	if (!ensure(SpawnedGhostPlatform)) { return; }
-	FVector ReadyPlatformSpawnLocation = SpawnedGhostPlatform->GetActorLocation();
-	SpawnedReadyPlatform = GetWorld()->SpawnActor<AActor>
-		(
-			ReadyPlatform,
-			ReadyPlatformSpawnLocation,
-			FRotator::ZeroRotator
-			);
-	SpawnedReadyPlatform->FindComponentByClass<UStaticMeshComponent>()->OnComponentHit.AddDynamic(this, &UBuildingComponent::OnReadyPlatformHit);
-	Tink->SetBuildingEnergyExpend(BuildingEnergyCost);
-	SpawnedGhostPlatform->Destroy();
-}
 
-void UBuildingComponent::OnReadyPlatformHit(UPrimitiveComponent * HitComponent, AActor * OtherActor, UPrimitiveComponent * OtherComponent, FVector NormalImpulse, const FHitResult & Hit)
-{
-
-}
-
-
-void UBuildingComponent::ComsumeBuildingEnergy()
-{
-	if (TinkController->GetSightRayHitResult().GetActor())
+	//Compare ghost platform static mesh name with mesh component name of hitted actor 
+	FString OtherActorName = HittedActor->FindComponentByClass<UStaticMeshComponent>()->GetName();
+	if (OtherActorName == GhostPlatformName)
 	{
-		auto Target = TinkController->GetSightRayHitResult().GetActor();
-		auto TargetName = Target->FindComponentByClass<UStaticMeshComponent>()->GetName();
-		if (TargetName == TEXT("ReadyPlatform"))
-		{
-			Target->Destroy();
-			Tink->SetBuildingEnergyExpend(BuildingEnergyForPlatform);
-		}
+		FVector ReadyPlatformSpawnLocation = SpawnedGhostPlatform->GetActorLocation();
+		AActor* SpawnedReadyPlatform = GetWorld()->SpawnActor<AActor>
+			(
+				ReadyPlatform,
+				ReadyPlatformSpawnLocation,
+				FRotator::ZeroRotator
+			);
+		ReadyPlatformName = SpawnedReadyPlatform->FindComponentByClass<UStaticMeshComponent>()->GetName();
+		Tink->SetBuildingEnergyExpend(BuildingEnergyCost);
+		SpawnedGhostPlatform->Destroy();
 	}
+
+}
+
+//Shot consume projectile and bind paltform consume logic
+void UBuildingComponent::ComsumePlatformShot()
+{
+	UE_LOG(LogTemp, Warning, TEXT("OnConsumegHit called"))
+
+	if (!ensure(Gun)) { return; }
+	if (!ensure(ConsumeProjectile)) { return; }
+
+	//Spawn projectile on the socket location of gun
+	AProjectile* SpawnedProjectile = GetWorld()->SpawnActor<AProjectile>
+		(
+			ConsumeProjectile,
+			Gun->GetSocketLocation(FName("Projectile")),
+			Gun->GetSocketRotation(FName("Projectile"))
+			);
+	if (SpawnedProjectile)
+	{
+		SpawnedProjectile->OnProjectileHitSpecialAction.AddDynamic(this, &UBuildingComponent::OnConsumeHit);
+		SpawnedProjectile->LaunchProjectile(ConsumeShotLaunchSpeed);
+	}
+
+
+}
+
+//Destroy paltform and add building energy
+void UBuildingComponent::OnConsumeHit(AActor * HittedActor)
+{
+	if (!ensure(Tink)) { return; }
+
+	//Compare ready platform static mesh name with mesh component name of hitted actor 
+	FString OtherActorName = HittedActor->FindComponentByClass<UStaticMeshComponent>()->GetName();
+	if (OtherActorName == ReadyPlatformName)
+	{
+		HittedActor->Destroy();
+		Tink->SetBuildingEnergyExpend(BuildingEnergyForPlatformConsume);
+	}
+
 }
 
