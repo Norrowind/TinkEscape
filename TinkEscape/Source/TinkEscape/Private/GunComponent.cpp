@@ -69,9 +69,9 @@ void UGunComponent::MoveGun(FVector AimDirection)
 	FRotator GunRotator = GetForwardVector().Rotation();
 	FRotator AimAsRotator = AimDirection.Rotation();
 	FRotator DeltaRotator = AimAsRotator - GunRotator;
-
-	float RawRotationChange = DeltaRotator.Pitch * MaxDegreesPerSecond * GetWorld()->DeltaTimeSeconds;
+	float DeltaRotatorFixedPitch = FMath::Clamp<float>(DeltaRotator.Pitch, -1.0f, 1.0f);
+	float RawRotationChange = DeltaRotatorFixedPitch * MaxDegreesPerSecond * GetWorld()->DeltaTimeSeconds;
 	float RotationChange = FMath::Clamp<float>(RawRotationChange, MinDegreesElevation, MaxDegreesElevation);
-	AddLocalRotation(FRotator(RotationChange, 0.0f, 0.0f));
+	AddRelativeRotation(FRotator(RotationChange, 0.0f, 0.0f));
 
 }

@@ -115,7 +115,10 @@ void UBuildingComponent::OnBuildingHit(AActor * HittedActor)
 		Tink->SetBuildingEnergyExpend(BuildingEnergyCost);
 		SpawnedGhostPlatform->Destroy();
 	}
-
+	else
+	{
+		SpawnedGhostPlatform->Destroy();
+	}
 }
 
 //Shot consume projectile and bind paltform consume logic

@@ -89,6 +89,7 @@ void UHoverComponent::ApplyForceToHover(const FHitResult HitResult)
 	FVector VectorHoveringForce = HitResult.ImpactNormal * InterpolationResult;
 	if (!ensure(DroidBody)) { return; }
 	DroidBody->AddForce(VectorHoveringForce);
+
 }
 
 void UHoverComponent::DeactivateHover()
