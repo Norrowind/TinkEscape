@@ -6,12 +6,22 @@
 #include "GameFramework/Pawn.h"
 #include "Tink.generated.h"
 
+
+//Enum to check which gun is used right now
+UENUM()
+enum class EGunUsed :uint8
+{
+	BuildingGun,
+	KineticGun
+};
+
 //Forward declaration
 class USpringArmComponent;
 class UCameraComponent;
 class UDroidMovementComponent;
 class UDroidBody;
 class UBuildingComponent;
+class UKineticComponent;
 
 UCLASS()
 class TINKESCAPE_API ATink : public APawn
@@ -43,6 +53,12 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, Category = "Setup")
 	UBuildingComponent* BuildingComponent = nullptr;
+
+	UPROPERTY(VisibleAnywhere, Category = "Setup")
+	UKineticComponent* KineticComponent = nullptr;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Setup")
+	EGunUsed GunUsed = EGunUsed::BuildingGun;
 	
 public:	
 	// Called to bind functionality to input
@@ -79,6 +95,10 @@ private:
 
 	void GunAlternativeAction();
 
+	void UseBuildingGun();
+
+	void UseKineticGun();
+
 	//Input variable
 	FVector2D CameraInput;
 
@@ -96,4 +116,6 @@ private:
 	//Energy which Tink use to build platforms, initialize in begin play
 	int32 BuildingEnergy;
 	int32 StartingBuildingEnergy = 100;
+
+
 };

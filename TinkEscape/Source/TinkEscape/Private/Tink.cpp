@@ -7,6 +7,7 @@
 #include "DroidMovementComponent.h"
 #include "DroidBody.h"
 #include "BuildingComponent.h"
+#include "KineticComponent.h"
 
 
 // Sets default values
@@ -35,6 +36,8 @@ ATink::ATink()
 	DroidMovementComponent = CreateDefaultSubobject<UDroidMovementComponent>(TEXT("MovingComponent"));
 
 	BuildingComponent = CreateDefaultSubobject<UBuildingComponent>(TEXT("BuildingComponent"));
+
+	KineticComponent = CreateDefaultSubobject<UKineticComponent>(TEXT("KineticComponent"));
 
 }
 
@@ -99,6 +102,8 @@ void ATink::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAction("GunAction", IE_Pressed, this, &ATink::GunPressed);
 	PlayerInputComponent->BindAction("GunAction", IE_Released, this, &ATink::GunReleased);
 	PlayerInputComponent->BindAction("GunAlternativeAction", IE_Pressed, this, &ATink::GunAlternativeAction);
+	PlayerInputComponent->BindAction("UseBuildingGun", IE_Pressed, this, &ATink::UseBuildingGun);
+	PlayerInputComponent->BindAction("UseKineticGun", IE_Pressed, this, &ATink::UseKineticGun);
 }
 
 
@@ -118,15 +123,53 @@ void ATink::CameraYaw(float AxisValue)
 
 void ATink::GunPressed()
 {
-	BuildingComponent->PlaceGhostPlatform();
+	if (GunUsed == EGunUsed::BuildingGun)
+	{
+		BuildingComponent->PlaceGhostPlatform();
+	}
+	else if (GunUsed == EGunUsed::KineticGun)
+	{
+		KineticComponent->KineticShotPowerUp();
+	}
+
 }
 
 void ATink::GunReleased()
 {
-	BuildingComponent->PlatformBuildShot();
+	if (GunUsed == EGunUsed::BuildingGun)
+	{
+		BuildingComponent->PlatformBuildShot();
+	}
+	else if (GunUsed == EGunUsed::KineticGun)
+	{
+		KineticComponent->KineticShot();
+	}
 }
 
 void ATink::GunAlternativeAction()
 {
-	BuildingComponent->ComsumePlatformShot();
+	if (GunUsed == EGunUsed::BuildingGun)
+	{
+		BuildingComponent->ComsumePlatformShot();
+	}
+	else if (GunUsed == EGunUsed::KineticGun)
+	{
+		KineticComponent->GravityOffShot();
+	}
+}
+
+void ATink::UseBuildingGun()
+{
+	if (!KineticComponent->IsCharging())
+	{
+		GunUsed = EGunUsed::BuildingGun;
+	}
+}
+
+void ATink::UseKineticGun()
+{
+	if (!BuildingComponent->IsBuilding())
+	{
+		GunUsed = EGunUsed::KineticGun;
+	}
 }

@@ -42,6 +42,11 @@ void UBuildingComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 	}
 }
 
+bool UBuildingComponent::IsBuilding() const
+{
+	return bIsBuilding;
+}
+
 void UBuildingComponent::PlaceGhostPlatform()
 {
 	if (!ensure(TinkController)) { return; }
@@ -159,4 +164,5 @@ void UBuildingComponent::OnConsumeHit(AActor * HittedActor)
 	}
 
 }
+
 

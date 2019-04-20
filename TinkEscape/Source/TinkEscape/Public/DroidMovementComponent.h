@@ -41,7 +41,7 @@ private:
 	float KineticEnergySpentForJump;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Jumping")
-	float KineticEnergyJumpCostForSecond = 50;
+	float KineticEnergyJumpCostForSecond = 50.0f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Jumping")
 	float MinForceToApplyForJump = 2000000.0f;

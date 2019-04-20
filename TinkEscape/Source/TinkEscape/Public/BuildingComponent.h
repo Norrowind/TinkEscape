@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "BuildingComponent.generated.h"
 
+//Forward declaration
 class ATinkController;
 class ATink;
 class AProjectile;
@@ -35,10 +36,12 @@ public:
 	void ComsumePlatformShot();
 
 	UFUNCTION(BlueprintCallable, Category = "BuildingGun")
-	void OnBuildingHit(AActor * OtherActor);
+	void OnBuildingHit(AActor * HittedActor);
 
 	UFUNCTION(BlueprintCallable, Category = "BuildingGun")
-	void OnConsumeHit(AActor * OtherActor);
+	void OnConsumeHit(AActor * HittedActor);
+
+	bool IsBuilding() const;
 
 private:
 
