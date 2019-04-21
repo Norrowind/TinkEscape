@@ -100,7 +100,6 @@ void UBuildingComponent::PlatformBuildShot()
 //Spawning Ready Platform when projectile hit Ghost Platform
 void UBuildingComponent::OnBuildingHit(AActor * HittedActor)
 {
-	UE_LOG(LogTemp, Warning, TEXT("OnBuildingHit called"))
 
 	if (!ensure(Tink)) { return; }
 	if (!ensure(SpawnedGhostPlatform)) { return; }
@@ -129,7 +128,6 @@ void UBuildingComponent::OnBuildingHit(AActor * HittedActor)
 //Shot consume projectile and bind paltform consume logic
 void UBuildingComponent::ComsumePlatformShot()
 {
-	UE_LOG(LogTemp, Warning, TEXT("OnConsumegHit called"))
 
 	if (!ensure(Gun)) { return; }
 	if (!ensure(ConsumeProjectile)) { return; }

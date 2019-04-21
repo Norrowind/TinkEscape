@@ -71,6 +71,7 @@ void AProjectile::OnHit(UPrimitiveComponent * HitComponent, AActor * OtherActor,
 
 	FTimerHandle DestroyTimer;
 	GetWorld()->GetTimerManager().SetTimer(DestroyTimer, this, &AProjectile::OnTimeToDestroy, DestroyDelay);
+	CollisionMesh->SetNotifyRigidBodyCollision(false);
 }
 
 void AProjectile::OnTimeToDestroy()

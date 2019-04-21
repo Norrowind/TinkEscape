@@ -87,12 +87,15 @@ void UKineticComponent::GravityOffShot()
 void UKineticComponent::GravityOffHit(AActor * HittedActor)
 {
 	UStaticMeshComponent* HittedMesh = HittedActor->FindComponentByClass<UStaticMeshComponent>();
+	UE_LOG(LogTemp, Warning, TEXT("StaticMesh name: %s"), *HittedMesh->GetName())
 	if (HittedMesh)
 		{
 			if (HittedMesh->IsSimulatingPhysics())
 			{
+				
 				if (HittedMesh->IsGravityEnabled())
 				{
+					
 					HittedMesh->SetEnableGravity(false);
 					HittedMesh->SetLinearDamping(GravityOffLinearDamping);
 					HittedMesh->SetAngularDamping(GravityOffAngularDamping);
